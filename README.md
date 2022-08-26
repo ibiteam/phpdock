@@ -1,6 +1,6 @@
 # phpdock
 
-## [中文文档](readme_zh_CN.md)
+## [中文文档](README_zh_CN.md)
 
 <p align="center">⛵<code>phpdock</code> is a normal PHP environment for Docker, you can use it to build  the same PHP environment on your local,test,production environment.</p>
 
@@ -34,16 +34,17 @@ wait the images download and containers run , you wil see the services is up
 ![phpdock](./files/2022-08-26_15-23.png)
 
 
-# restart nginx
+## restart nginx
 ```
 docker-compose restart nginx
 ```
 
-# run `composer install` in php container ,The example assumes that the phpDock sibling has a 'laravel' folder，tips:Local files are mapped to the container `/var/www`
+## run `composer install`
+* The example assumes that the phpDock sibling has a 'laravel' folder
 ```
 docker-compose exec -T php bash -c "cd laravel && composer install --no-dev"
 ```
-
+* tips:Local files are mapped to the container `/var/www`
 
 # Documentation
 

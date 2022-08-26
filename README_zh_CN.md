@@ -32,15 +32,17 @@ docker-compose up -d nginx mysql php redis
 ![phpdock](./files/2022-08-26_15-23.png)
 
 
-# 重启nginx
+## 重启nginx
 ```
 docker-compose restart nginx
 ```
 
-# 在容器中运行 composer install ,示例假设phpdock同级有一个`laravel`的文件夹，tips:本地文件都映射进容器的`/var/www`
+## 运行`composer install` 
+* 示例假设phpdock同级有一个`laravel`的文件夹
 ```
 docker-compose exec -T php bash -c "cd laravel && composer install --no-dev"
 ```
+* tips:本地文件都映射进容器的`/var/www`
 
 # 文档
 
