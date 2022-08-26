@@ -1,0 +1,97 @@
+version: '3'
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    volumes:
+      - ../:/var/www
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./logs/nginx/:/var/log/nginx
+      - ./nginx/${NGINX_CONF_DIR}/:/etc/nginx/conf.d/
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    depends_on:
+      - php
+
+    networks:
+      - backend
+  php:
+    build: ./php-fpm/php${PHP_VERSION}
+    container_name: php
+    volumes:
+      - ./php-fpm/php${PHP_VERSION}/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
+      - ../:/var/www
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - 9000:9000
+    restart: always
+    user: www-data
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    tty: true
+    volumes:
+      - ./data/redis:/data
+      - ./logs/redis/:/var/log/redis
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+    restart: always
+    environment:
+      - TZ=${TIME_ZONE}
+      - LANG=en_US.UTF-8
+
+  mysql:
+    build: ./mysql
+    container_name: mysql
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ${MYSQL_DATA_PATH}:/var/lib/mysql
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - backend
+
+
+  rabbit:
+    image: rabbitmq:3.9.22-management
+    container_name: rabbit
+    restart: always
+    ports:
+      - "15672:15672"
+      - "4369:4369"
+      - "5672:5672"
+      - "25672:25672"
+    environment:
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - backend
+
+  cron:
+    image: mcuadros/ofelia:latest
+    container_name: cron
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./cron/config.ini:/etc/ofelia/config.ini
+    networks:
+      - backend

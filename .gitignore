@@ -1,0 +1,5 @@
+.idea/
+.env
+cron/config.ini
+docker-compose.yml
+nginx/production/*.conf
