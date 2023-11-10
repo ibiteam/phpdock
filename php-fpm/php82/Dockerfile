@@ -8,7 +8,11 @@ RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' 
 
 RUN apt-get update -y &&  apt-get install -y  git libz-dev libzip-dev libfreetype6-dev libmcrypt-dev  libjpeg-dev libpng-dev
 
-RUN docker-php-ext-install gd \
+RUN docker-php-ext-configure gd \
+      --with-freetype=/usr/include/ \
+      --with-jpeg=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-enable gd \
     && docker-php-ext-install zip \
     && docker-php-ext-install bcmath \
     && docker-php-ext-install sockets \
